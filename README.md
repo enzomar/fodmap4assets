@@ -1,0 +1,1 @@
+# fodmap4assets
