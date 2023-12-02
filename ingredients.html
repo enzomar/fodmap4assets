@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ingredients Grid</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .ingredient-item {
+      text-align: center;
+    }
+
+    .ingredient-image {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Ingredients Grid</h1>
+
+<div class="grid-container" id="ingredientsGrid"></div>
+
+<script>
+  // Load ingredientsData from local JSON file
+  fetch('en.json')
+    .then(response => response.json())
+    .then(data => {
+      const ingredientsData = {};
+
+      // Build ingredientsData with imageURLs dynamically
+      Object.keys(data).forEach(id => {
+        const name = data[id];
+        const imageUrl = `https://cdn.jsdelivr.net/gh/enzomar/fodmap4assets@main/ingredients/${id}.jpeg`;
+        ingredientsData[id] = { name, imageUrl };
+      });
+
+      // Function to create HTML elements for each ingredient
+      function createIngredientElement(id, name, imageUrl) {
+        const container = document.getElementById("ingredientsGrid");
+
+        const ingredientItem = document.createElement("div");
+        ingredientItem.className = "ingredient-item";
+
+        const image = document.createElement("img");
+        image.className = "ingredient-image";
+        image.src = imageUrl;
+        image.alt = name;
+
+        const nameElement = document.createElement("p");
+        nameElement.textContent = name;
+
+        const fileNameElement = document.createElement("p");
+        fileNameElement.textContent = `File Name: ${id}.jpeg`;
+
+        ingredientItem.appendChild(image);
+        ingredientItem.appendChild(nameElement);
+        ingredientItem.appendChild(fileNameElement);
+
+        container.appendChild(ingredientItem);
+      }
+
+      // Loop through the ingredients data and create elements for each
+      Object.keys(ingredientsData).forEach(id => {
+        const { name, imageUrl } = ingredientsData[id];
+        createIngredientElement(id, name, imageUrl);
+      });
+    });
+</script>
+
+</body>
+</html>
