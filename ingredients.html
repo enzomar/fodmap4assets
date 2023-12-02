@@ -10,28 +10,63 @@
       margin: 20px;
     }
 
+    header {
+      width: 100%; /* Header spans the entire width */
+      padding: 10px;
+    }
+
+    .content {
+      display: flex;
+      flex: 1; /* Allow the content to grow and take the remaining space */
+    }
+
     .grid-container {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       gap: 20px;
+      width: 100%;
     }
 
     .ingredient-item {
       text-align: center;
+      cursor: pointer;
     }
 
     .ingredient-image {
-      max-width: 100%;
-      height: auto;
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
       border-radius: 8px;
+    }
+
+    .selected {
+      border: 2px solid red;
+    }
+
+    #selectedView {
+      width: 240px; /* Fixed width for the selected ingredients view */
+      overflow: auto; /* Enable scrolling within the fixed width */
+      background-color: #f0f0f0;
+      padding: 10px;
+      right: 0;
+      margin-left: 10px;
     }
   </style>
 </head>
 <body>
 
-<h1>Ingredients Grid</h1>
+  <header>
+    <h1>Ingredients Grid</h1>
+  </header>
 
-<div class="grid-container" id="ingredientsGrid"></div>
+  <div class="content">
+    <div class="grid-container" id="ingredientsGrid"></div>
+
+    <div id="selectedView">
+      <h2>Selected Ingredients</h2>
+      <ul id="selectedList"></ul>
+    </div>
+  </div>
 
 <script>
   // Load ingredientsData from local JSON file
@@ -46,6 +81,8 @@
         const imageUrl = `https://cdn.jsdelivr.net/gh/enzomar/fodmap4assets@main/ingredients/${id}.jpeg`;
         ingredientsData[id] = { name, imageUrl };
       });
+
+      const selectedIngredients = new Set();
 
       // Function to create HTML elements for each ingredient
       function createIngredientElement(id, name, imageUrl) {
@@ -63,13 +100,36 @@
         nameElement.textContent = name;
 
         const fileNameElement = document.createElement("p");
-        fileNameElement.textContent = `File Name: ${id}.jpeg`;
+        fileNameElement.textContent = `${id}.jpeg`;
 
         ingredientItem.appendChild(image);
         ingredientItem.appendChild(nameElement);
         ingredientItem.appendChild(fileNameElement);
 
+        // Event listener for clicking on an image
+        ingredientItem.addEventListener("click", () => {
+          if (selectedIngredients.has(id)) {
+            selectedIngredients.delete(id);
+            ingredientItem.classList.remove("selected");
+          } else {
+            selectedIngredients.add(id);
+            ingredientItem.classList.add("selected");
+          }
+          updateSelectedView();
+        });
+
         container.appendChild(ingredientItem);
+      }
+
+      // Function to update the selected view
+      function updateSelectedView() {
+        const selectedView = document.getElementById("selectedList");
+        selectedView.innerHTML = "";
+        selectedIngredients.forEach(id => {
+          const listItem = document.createElement("li");
+          listItem.textContent = `${id}.jpeg`;
+          selectedView.appendChild(listItem);
+        });
       }
 
       // Loop through the ingredients data and create elements for each
